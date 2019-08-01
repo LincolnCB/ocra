@@ -452,6 +452,7 @@ class MRI_Sig_Widget(MRI_Sig_Widget_Base, MRI_Sig_Widget_Form):
             self.axes_top.set_xlabel('frequency, Hz')
 
         elif self.seqType_idx == 1:  # SE
+			# the fourier transform is taken on a snippet that is -4ms to + 4ms around the echo
             dclip = data[int((self.para_TE.value()-4)*250):int((self.para_TE.value()+4)*250)]
             freqaxis = np.linspace(-125000, 125000, 2*4*250)  # 2000 points
             fft_mag = abs(np.fft.fftshift(np.fft.fft(np.fft.fftshift(dclip))))
