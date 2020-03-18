@@ -176,7 +176,7 @@ cell xilinx.com:ip:blk_mem_gen:8.4 sequence_memory {
   WRITE_WIDTH_B 64
   ENABLE_A Always_Enabled
   ENABLE_B Always_Enabled
-  REGISTER_PORTB_OUTPUT_OF_MEMORY_PRIMITIVES false
+  #REGISTER_PORTB_OUTPUT_OF_MEMORY_PRIMITIVES false
 }
 
 # Load some initial data to the memory
