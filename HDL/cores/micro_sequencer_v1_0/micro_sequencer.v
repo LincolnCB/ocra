@@ -768,7 +768,7 @@ module micro_sequencer #
 	     end
 	     BTR: ;
 	     HALT: begin
-		pulse[15:8] <= `PC;
+		//pulse[15:8] <= `PC;
 		state <= Halted;
 		end // when the HALT command is encountered, end the simulation, needs to be modified later
 	     PI: begin
@@ -907,7 +907,7 @@ module micro_sequencer #
 	   // Condition itype == `RESET must after the other `IE condition
 	   taskInterrupt(`RESET);
 	   state <= Fetch;
-	   pulse[15:8] <= 8'b10101010;
+	   pulse[15:8] <= 8'b00000000;
 	   slv_reg1 <= 8'h88; //slv_reg0;
 	end 
       else if (inExe == 1)
