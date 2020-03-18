@@ -105,7 +105,7 @@ connect_bd_net [get_bd_pins cfg_0/cfg_data] [get_bd_pins shim_dac_0/slice_0/Din]
 set_property -dict [list CONFIG.Register_PortB_Output_of_Memory_Primitives {true} CONFIG.Register_PortB_Output_of_Memory_Core {false}] [get_bd_cells gradient_memory_0]
 
 #
-# try to connect the bottom 8 bits of the pulse output of the sequencer to the positive gpoi
+# try to connect the bottom 8 bits of the pulse output of the sequencer to the positive gpio
 #
 # Delete input/output port
 delete_bd_objs [get_bd_ports exp_p_tri_io]
