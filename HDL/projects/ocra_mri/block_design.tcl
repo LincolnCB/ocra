@@ -1,6 +1,8 @@
 # Create processing_system7
 cell xilinx.com:ip:processing_system7:5.5 ps_0 {
-  PCW_IMPORT_BOARD_PRESET cfg/red_pitaya.xml
+    PCW_IMPORT_BOARD_PRESET cfg/red_pitaya.xml
+    PCW_USE_FABRIC_INTERRUPT 1 
+    PCW_IRQ_F2P_INTR 1
 } {
   M_AXI_GP0_ACLK ps_0/FCLK_CLK0
 }
@@ -11,6 +13,14 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
   Master Disable
   Slave Disable
 } [get_bd_cells ps_0]
+
+#
+# TW 05/05/2020:
+# this doesn't cause any errors, but it also doesn't do anything...
+#
+# https://www.xilinx.com/support/answers/70347.html
+set_property CONFIG.PCW_NUM_F2P_INTR_INPUTS.VALUE_SRC DEFAULT [get_bd_cells ps_0]
+set_property CONFIG.PCW_NUM_F2P_INTR_INPUTS {3} [get_ips system_ps_0_0]
 
 # Create proc_sys_reset
 cell xilinx.com:ip:proc_sys_reset:5.0 rst_0
@@ -202,13 +212,13 @@ set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_sequence_writer_reg0]
 set_property OFFSET 0x40030000 [get_bd_addr_segs ps_0/Data/SEG_sequence_writer_reg0]
 
 # Create microsequencer
-cell open-mri:user:micro_sequencer:1.0 micro_sequencer {
+cell open-mri:user:micro_sequencer:1.1 micro_sequencer {
   C_S_AXI_DATA_WIDTH 32
   C_S_AXI_ADDR_WIDTH 32
   BRAM_DATA_WIDTH 64
   BRAM_ADDR_WIDTH 13
 } {
-  BRAM_PORTA sequence_memory/BRAM_PORTB
+    BRAM_PORTA sequence_memory/BRAM_PORTB
 }
 # Create all required interconnections
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
@@ -433,3 +443,15 @@ connect_bd_net [get_bd_pins pio_concat_0/In2] [get_bd_pins serial_attenuator/att
 
 # connect to pins
 connect_bd_net [get_bd_pins exp_p_tri_io] [get_bd_pins pio_concat_0/Dout]
+
+#
+# Connect microsequencer IRQ pins to PS
+#
+# This is a stupid workaround, but google didn't find me anything else, until now
+# 
+cell xilinx.com:ip:xlconcat:2.1 irq_concat_0 {
+    NUM_PORTS 1
+}
+
+connect_bd_net [get_bd_pins irq_concat_0/In0] [get_bd_pins micro_sequencer/ps_interrupts]
+connect_bd_net [get_bd_pins ps_0/IRQ_F2P] [get_bd_pins irq_concat_0/Dout]
