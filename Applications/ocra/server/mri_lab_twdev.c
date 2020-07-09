@@ -2249,8 +2249,40 @@ int main(int argc, char *argv[])
 
 	printf("Setting FPGA clock to 143 MHz !\n"); fflush(stdout);
 	/* set FPGA clock to 143 MHz */
+
+	/* 0XF8000008: SLCR_UNLOCK
+	   Write the unlock key, 0xDF0D, to enable writes to the slcr registers. 
+	   All slcr registers, 0xF800_0000 to 0xF800_0B74, are writeable until locked using the SLCR_LOCK register. 
+	   A read of this register returns zero.
+	 */
 	slcr[2] = 0xDF0D;
-	slcr[92] = (slcr[92] & ~0x03F03F30) | 0x00100700;
+
+	/* 0XF8000170:   FPGA0_CLK_CTRL (PL Clock 0 Output control)
+	   
+	   r/w:          rw
+	   mask:         0x03f03f30
+	   reset value:  0x00000000
+	   subfields:
+	   SRCSEL	 bits: 5:4	mask: 0x30        Select the source used to generate the clock: 
+	                                                    0x00: Source for generated clock is IO PLL. 
+							    0x10: Source for generated clock is ARM PLL. 
+							    0x11: Source for generated clock is DDR PLL.
+
+	   DIVISOR0	 bits: 13:8     mask: 0x3f00	  Provides the divisor used to divide the source clock to generate 
+                                                          the required generated clock frequency. 
+                                                          First cascade divider.
+
+	   DIVISOR1	 bits: 25:20    mask: 0x3f00000	  Provides the divisor used to divide the source clock to generate 
+                                                          the required generated clock frequency. 
+                                                          Second cascade divide
+	 */
+	
+	// this is a super weird statement as well, for many reasons
+	slcr[92] = (slcr[92] & ~0x03F03F30) | 0x00100700; // set CLK0 to IO_PLL/7 = 1000 MHz/7 = 142.857142857 MHz
+
+	// slcr should also be locked again
+
+	
 	printf(".... Done !\n"); fflush(stdout);
 
 	printf("Erasing pulse sequence memory !\n"); fflush(stdout);
