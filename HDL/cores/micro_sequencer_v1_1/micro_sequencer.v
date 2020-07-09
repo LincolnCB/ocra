@@ -125,6 +125,7 @@ module micro_sequencer #(parameter integer C_S_AXI_DATA_WIDTH = 32,
      INC =         6'b000010,   // increment value of regiuster by one
      LITR =        6'b000011,   // "Last Instruction in TR"
      LD64 = 	   6'b000100,	// load 64 bit value to register
+     RASTCSYNC =   6'b000101,   // synchronize/reset raster clocks
      TXOFFSET =    6'b001000,   // set the txoffset to a 16 bit value in formatA
      GRADOFFSET =  6'b001001,   // set the gradoffset to a 16 bit value in formatA
      JNZ =         6'b010000,   // jump to immeduate address of register is nonzero
