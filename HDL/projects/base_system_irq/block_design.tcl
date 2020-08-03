@@ -1,5 +1,5 @@
 # Create clk_wiz
-cell xilinx.com:ip:clk_wiz:5.3 pll_0 {
+cell xilinx.com:ip:clk_wiz:6.0 pll_0 {
   PRIMITIVE PLL
   PRIM_IN_FREQ.VALUE_SRC USER
   PRIM_IN_FREQ 125.0
@@ -29,3 +29,28 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
   Master Disable
   Slave Disable
 } [get_bd_cells ps_0]
+
+
+# Create axi_cfg_register
+cell pavel-demin:user:axi_cfg_register:1.0 cfg_0 {
+  CFG_DATA_WIDTH 32
+  AXI_ADDR_WIDTH 32
+  AXI_DATA_WIDTH 32
+}
+
+# Create all required interconnections
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
+  Master /ps_0/M_AXI_GP0
+  Clk Auto
+} [get_bd_intf_pins cfg_0/S_AXI]
+
+set_property RANGE 4K [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
+set_property OFFSET 0x40000000 [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
+
+cell xilinx.com:ip:xlconcat:2.1 irq_concat_0 {
+    NUM_PORTS 1
+}
+
+connect_bd_net [get_bd_pins irq_concat_0/In0] [get_bd_pins cfg_0/cfg_data]
+connect_bd_net [get_bd_pins ps_0/IRQ_F2P] [get_bd_pins irq_concat_0/Dout]
+
