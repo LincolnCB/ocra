@@ -10,6 +10,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+// local includes
+#include "server_config.h"
+
 #define PI 3.14159265
 
 typedef union {
@@ -2200,6 +2203,7 @@ int main(int argc, char *argv[])
 
 
   // set up shared memory (please refer to the memory offset table)
+<<<<<<< HEAD
 	slcr = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0xF8000000);
 	cfg = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40000000);
 	sts = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40001000);
@@ -2208,6 +2212,16 @@ int main(int argc, char *argv[])
 	pulseq_memory = mmap(NULL, 16*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40030000);
 	seq_config = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40040000);
 	attn_config = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40050000);
+=======
+	slcr = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, SLCR_OFFSET);
+	cfg = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, CFG_OFFSET);
+	sts = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, STS_OFFSET);
+	rx_data = mmap(NULL, 16*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, RX_DATA_OFFSET);
+	tx_data = mmap(NULL, 16*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, TX_DATA_OFFSET);
+	pulseq_memory = mmap(NULL, 16*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, PULSEQ_MEMORY_OFFSET);
+	seq_config = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, SEQ_CONFIG_OFFSET);  
+	attn_config = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, ATTN_CONFIG_OFFSET); 
+>>>>>>> remotes/origin/stemlab122
 
 
 	// Attenuation
@@ -2234,6 +2248,7 @@ int main(int argc, char *argv[])
 	gradient_memory_x = mmap(NULL, 2*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40002000);
 	gradient_memory_y = mmap(NULL, 2*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40004000);
 	gradient_memory_z = mmap(NULL, 2*sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40006000);
+
 
 	printf("Setup standard memory maps !\n"); fflush(stdout);
 
@@ -2295,7 +2310,7 @@ int main(int argc, char *argv[])
 
 	// set the NCO to 15.67 MHz
 	printf("setting frequency to %.4f MHz\n",default_frequency/1e6f);
-	*rx_freq = (uint32_t)floor(default_frequency / 125.0e6 * (1<<30) + 0.5);
+	*rx_freq = (uint32_t)floor(default_frequency / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
 
 	/* set default rx sample rate */
 	*rx_rate = 250;
@@ -2414,7 +2429,7 @@ int main(int argc, char *argv[])
     // Change center frequency when client status is idle (not start yet)
     if ((command>>28) == 1) {
       value = command & 0xfffffff;
-      *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+      *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
       printf("Setting frequency to %.4f MHz\n",value/1e6f);
       if(value < 0 || value > 60000000) {
         printf("Frequency value out of range\n");
@@ -2463,7 +2478,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -2632,7 +2647,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -2778,7 +2793,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -2939,7 +2954,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -3125,7 +3140,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -3511,7 +3526,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
@@ -3656,7 +3671,7 @@ int main(int argc, char *argv[])
 
         if ( trig == 1 ) { // Change center frequency
           value = command & 0xfffffff;
-          *rx_freq = (uint32_t)floor(value / 125.0e6 * (1<<30) + 0.5);
+          *rx_freq = (uint32_t)floor(value / FPGA_CLK_FREQ_HZ * (1<<30) + 0.5);
           printf("Setting frequency to %.4f MHz\n",value/1e6f);
           if(value < 0 || value > 60000000) {
             printf("Frequency value out of range\n");
