@@ -139,11 +139,8 @@ devicetree.dtb: tmp/$(NAME).tree/system.dts
 	dtc -I dts -O dtb -o devicetree.dtb \
 	  -i tmp/$(NAME).tree -@ tmp/$(NAME).tree/system-top.dts.preprocessed
 
-ocra_mri.dtbo: tmp/$(NAME).tree/system.dts
-	dtc -O dtb -o tmp/ocra_mri.dtbo -b 0 -@ tmp/$(NAME).tree/pl.dtsi
-
-shim_controller.dtbo: tmp/$(NAME).tree/system.dts
-	dtc -O dtb -o tmp/shim_controller.dtbo -b 0 -@ tmp/$(NAME).tree/pl.dtsi
+tmp/%.dtbo: tmp/$(NAME).tree/system.dts
+	dtc -O dtb -o tmp/$(NAME).dtbo -b 0 -@ tmp/$(NAME).tree/pl.dtsi
 
 tmp/cores_pavel/%: cores_pavel/%/core_config.tcl cores_pavel/%/*.v
 	mkdir -p $(@D)
