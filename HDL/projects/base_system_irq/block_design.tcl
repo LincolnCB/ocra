@@ -51,6 +51,12 @@ cell xilinx.com:ip:xlconcat:2.1 irq_concat_0 {
     NUM_PORTS 1
 }
 
-connect_bd_net [get_bd_pins irq_concat_0/In0] [get_bd_pins cfg_0/cfg_data]
+# Create xlslice
+cell xilinx.com:ip:xlslice:1.0 cfg_slice_0 {
+  DIN_WIDTH 32 DIN_FROM 15 DIN_TO 0 DOUT_WIDTH 16
+} {
+  Din cfg_0/cfg_data
+}
+connect_bd_net [get_bd_pins irq_concat_0/In0] [get_bd_pins cfg_slice_0/Dout]
 connect_bd_net [get_bd_pins ps_0/IRQ_F2P] [get_bd_pins irq_concat_0/Dout]
 
