@@ -20,22 +20,39 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
 # Create proc_sys_reset
 cell xilinx.com:ip:proc_sys_reset:5.0 rst_0
 
+# ORIGINAL
+# # Create clk_wiz
+# cell xilinx.com:ip:clk_wiz:6.0 pll_0 {
+#     PRIMITIVE PLL
+#     PRIM_IN_FREQ.VALUE_SRC USER
+#     PRIM_IN_FREQ 125.0
+#     PRIM_SOURCE Differential_clock_capable_pin
+#     CLKOUT1_USED true
+#     CLKOUT1_REQUESTED_OUT_FREQ 50.0
+#     CLKOUT2_USED false
+#     CLKOUT2_REQUESTED_OUT_FREQ 250.0
+#     CLKOUT2_REQUESTED_PHASE -90.0
+#     USE_RESET false
+#     USE_DYN_RECONFIG true
+# } {
+#   clk_in1_p adc_clk_p_i
+#   clk_in1_n adc_clk_n_i
+# }
+#
+# NEW
+## LCB: Trying to make single-ended input for snickerdoodle
 # Create clk_wiz
 cell xilinx.com:ip:clk_wiz:6.0 pll_0 {
     PRIMITIVE PLL
     PRIM_IN_FREQ.VALUE_SRC USER
     PRIM_IN_FREQ 125.0
-    PRIM_SOURCE Differential_clock_capable_pin
     CLKOUT1_USED true
     CLKOUT1_REQUESTED_OUT_FREQ 50.0
     CLKOUT2_USED false
-    CLKOUT2_REQUESTED_OUT_FREQ 250.0
-    CLKOUT2_REQUESTED_PHASE -90.0
     USE_RESET false
     USE_DYN_RECONFIG true
 } {
-  clk_in1_p adc_clk_p_i
-  clk_in1_n adc_clk_n_i
+  clk_in1 adc_clk_i
 }
 
 # create a block of memory of 256KB, which would consume 56 of the 60 36Kbit memory blocks available in the Z7010

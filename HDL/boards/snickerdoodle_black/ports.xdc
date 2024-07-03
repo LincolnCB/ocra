@@ -7,7 +7,43 @@
 ###############################################################################
 #
 #------------------------------------------------------------------------------
-# Constraints for GPIO outputs
+# STEMlab 125-14 Compatability Constraints
+#------------------------------------------------------------------------------
+
+# clock input
+
+set_property IOSTANDARD HSTL_I_18 [get_ports adc_clk_i]
+# 10MHz in, JB2.38
+set_property PACKAGE_PIN N18 [get_ports adc_clk_i]
+# TODO: find correct pin
+# set_property PACKAGE_PIN U19 [get_ports adc_clk_n_i]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {exp_p_tri_io[*]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {exp_n_tri_io[*]}]
+set_property SLEW FAST [get_ports {exp_n_tri_io[*]}]
+set_property DRIVE 8 [get_ports {exp_n_tri_io[*]}]
+set_property PULLTYPE PULLUP [get_ports {exp_p_tri_io[*]}]
+set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[*]}]
+
+# set_property PACKAGE_PIN G17 [get_ports {exp_p_tri_io[0]}]
+# set_property PACKAGE_PIN G18 [get_ports {exp_n_tri_io[0]}]
+# set_property PACKAGE_PIN H16 [get_ports {exp_p_tri_io[1]}]
+# set_property PACKAGE_PIN H17 [get_ports {exp_n_tri_io[1]}]
+# set_property PACKAGE_PIN J18 [get_ports {exp_p_tri_io[2]}]
+# set_property PACKAGE_PIN H18 [get_ports {exp_n_tri_io[2]}]
+# set_property PACKAGE_PIN K17 [get_ports {exp_p_tri_io[3]}]
+# set_property PACKAGE_PIN K18 [get_ports {exp_n_tri_io[3]}]
+# set_property PACKAGE_PIN L14 [get_ports {exp_p_tri_io[4]}]
+# set_property PACKAGE_PIN L15 [get_ports {exp_n_tri_io[4]}]
+# set_property PACKAGE_PIN L16 [get_ports {exp_p_tri_io[5]}]
+# set_property PACKAGE_PIN L17 [get_ports {exp_n_tri_io[5]}]
+# set_property PACKAGE_PIN K16 [get_ports {exp_p_tri_io[6]}]
+# set_property PACKAGE_PIN J16 [get_ports {exp_n_tri_io[6]}]
+# set_property PACKAGE_PIN M14 [get_ports {exp_p_tri_io[7]}]
+# set_property PACKAGE_PIN M15 [get_ports {exp_n_tri_io[7]}]
+
+#------------------------------------------------------------------------------
+# Default constraints for GPIO outputs
 #------------------------------------------------------------------------------
 # JA1 Connector
 #------------------------------------------------------------------------------
@@ -416,9 +452,10 @@ set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[23]}]
 set_property PACKAGE_PIN    P20         [get_ports {gpio3_tri_io[7]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[7]}]
 
-### JB2.38 (IO_L13P_T2_MRCC_34)
-set_property PACKAGE_PIN    N18         [get_ports {gpio3_tri_io[22]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[22]}]
+#### JB2.38 (IO_L13P_T2_MRCC_34)
+## Used for adc_clk_p_i
+# set_property PACKAGE_PIN    N18         [get_ports {gpio3_tri_io[22]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[22]}]
 
 ##------------------------------------------------------------------------------
 ## JC1 Connector
