@@ -10,37 +10,61 @@
 # STEMlab 125-14 Compatability Constraints
 #------------------------------------------------------------------------------
 
-# clock input
+# Single-ended 10MHz clock input
+# Pin: 10MHz_In JB2.38 N18
+set_property IOSTANDARD LVCMOS33 [get_ports ext_clk_i]
+set_property PACKAGE_PIN N18 [get_ports ext_clk_i]
 
-set_property IOSTANDARD HSTL_I_18 [get_ports adc_clk_i]
-# 10MHz in, JB2.38
-set_property PACKAGE_PIN N18 [get_ports adc_clk_i]
-# TODO: find correct pin
-# set_property PACKAGE_PIN U19 [get_ports adc_clk_n_i]
+# Trigger in
+# Pin: Trigger_In JB2.36 P19
+set_property IOSTANDARD LVCMOS33 [get_ports trigger_i]
+set_property PULLTYPE PULLUP [get_ports trigger_i]
+set_property PACKAGE_PIN P19 [get_ports trigger_i]
 
-set_property IOSTANDARD LVCMOS33 [get_ports {exp_p_tri_io[*]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {exp_n_tri_io[*]}]
-set_property SLEW FAST [get_ports {exp_n_tri_io[*]}]
-set_property DRIVE 8 [get_ports {exp_n_tri_io[*]}]
-set_property PULLTYPE PULLUP [get_ports {exp_p_tri_io[*]}]
-set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[*]}]
+# SPI CS out
+# Pin: ~DAC_CS+O JB2.5 N17
+set_property IOSTANDARD LVCMOS33 [get_ports cs_o]
+set_property SLEW FAST [get_ports cs_o]
+set_property DRIVE 8 [get_ports cs_o]
+set_property PULLTYPE PULLUP [get_ports cs_o]
+set_property PACKAGE_PIN N17 [get_ports cs_o]
 
-# set_property PACKAGE_PIN G17 [get_ports {exp_p_tri_io[0]}]
-# set_property PACKAGE_PIN G18 [get_ports {exp_n_tri_io[0]}]
-# set_property PACKAGE_PIN H16 [get_ports {exp_p_tri_io[1]}]
-# set_property PACKAGE_PIN H17 [get_ports {exp_n_tri_io[1]}]
-# set_property PACKAGE_PIN J18 [get_ports {exp_p_tri_io[2]}]
-# set_property PACKAGE_PIN H18 [get_ports {exp_n_tri_io[2]}]
-# set_property PACKAGE_PIN K17 [get_ports {exp_p_tri_io[3]}]
-# set_property PACKAGE_PIN K18 [get_ports {exp_n_tri_io[3]}]
-# set_property PACKAGE_PIN L14 [get_ports {exp_p_tri_io[4]}]
-# set_property PACKAGE_PIN L15 [get_ports {exp_n_tri_io[4]}]
-# set_property PACKAGE_PIN L16 [get_ports {exp_p_tri_io[5]}]
-# set_property PACKAGE_PIN L17 [get_ports {exp_n_tri_io[5]}]
-# set_property PACKAGE_PIN K16 [get_ports {exp_p_tri_io[6]}]
-# set_property PACKAGE_PIN J16 [get_ports {exp_n_tri_io[6]}]
-# set_property PACKAGE_PIN M14 [get_ports {exp_p_tri_io[7]}]
-# set_property PACKAGE_PIN M15 [get_ports {exp_n_tri_io[7]}]
+# SPI clock out
+# Pin: SCKI+ JB2.23 T20
+set_property IOSTANDARD LVCMOS33 [get_ports spi_clk_o]
+set_property SLEW FAST [get_ports spi_clk_o]
+set_property DRIVE 8 [get_ports spi_clk_o]
+set_property PULLTYPE PULLUP [get_ports spi_clk_o]
+set_property PACKAGE_PIN T20 [get_ports spi_clk_o]
+
+# SPI LDAC out
+# Pin: LDAC+ JB2.26 V16
+set_property IOSTANDARD LVCMOS33 [get_ports ldac_o]
+set_property SLEW FAST [get_ports ldac_o]
+set_property DRIVE 8 [get_ports ldac_o]
+set_property PULLTYPE PULLUP [get_ports ldac_o]
+set_property PACKAGE_PIN V16 [get_ports ldac_o]
+
+# SPI MOSI out (4 channels to DAC)
+# Pins:
+#   DAC_MOSI+0 JB2.20 W18
+#   DAC_MOSI+1 JB1.5  T11
+#   DAC_MOSI+2 JC1.11 T5
+#   DAC_MOSI+3 JB1.23 T16
+# Future:
+#   DAC_MOSI+4 JA2.8  K16
+#   DAC_MOSI+5 JA1.5  E18
+#   DAC_MOSI+6 JA2.26 K19
+#   DAC_MOSI+7 JA1.26 G19
+set_property IOSTANDARD LVCMOS33 [get_ports {dac_mosi_o[*]}]
+set_property SLEW FAST [get_ports {dac_mosi_o[*]}]
+set_property DRIVE 8 [get_ports {dac_mosi_o[*]}]
+set_property PULLTYPE PULLUP [get_ports {dac_mosi_o[*]}]
+set_property PACKAGE_PIN W18 [get_ports {dac_mosi_o[0]}]
+set_property PACKAGE_PIN T11 [get_ports {dac_mosi_o[1]}]
+set_property PACKAGE_PIN T5 [get_ports {dac_mosi_o[2]}]
+set_property PACKAGE_PIN T16 [get_ports {dac_mosi_o[3]}]
+
 
 #------------------------------------------------------------------------------
 # Default constraints for GPIO outputs
@@ -258,8 +282,9 @@ set_property PACKAGE_PIN    T19         [get_ports {gpio2_tri_io[24]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[24]}]
 
 ### JB1.5 (IO_L1P_T0_34)
-set_property PACKAGE_PIN    T11         [get_ports {gpio2_tri_io[8]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[8]}]
+## dac_mosi_o[1]
+# set_property PACKAGE_PIN    T11         [get_ports {gpio2_tri_io[8]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[8]}]
 
 ### JB1.6 (IO_L2N_T0_34)
 set_property PACKAGE_PIN    U12         [get_ports {gpio2_tri_io[11]}]
@@ -306,8 +331,9 @@ set_property PACKAGE_PIN    T14         [get_ports {gpio2_tri_io[16]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[16]}]
 
 ### JB1.23 (IO_L9P_T1_DQS_34)
-set_property PACKAGE_PIN    T16         [get_ports {gpio2_tri_io[18]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[18]}]
+## Used for dac_mosi_o[3]
+# set_property PACKAGE_PIN    T16         [get_ports {gpio2_tri_io[18]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio2_tri_io[18]}]
 
 ### JB1.24 (IO_L7N_T1_34)
 set_property PACKAGE_PIN    Y17         [get_ports {gpio2_tri_io[1]}]
@@ -361,8 +387,9 @@ set_property PACKAGE_PIN    R19         [get_ports {gpio3_tri_io[24]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[24]}]
 
 ### JB2.5 (IO_L23P_T3_34)
-set_property PACKAGE_PIN    N17         [get_ports {gpio3_tri_io[8]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[8]}]
+## Used for cs_o
+# set_property PACKAGE_PIN    N17         [get_ports {gpio3_tri_io[8]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[8]}]
 
 ### JB2.6 (IO_L24N_T3_34)
 set_property PACKAGE_PIN    P16         [get_ports {gpio3_tri_io[11]}]
@@ -405,12 +432,14 @@ set_property PACKAGE_PIN    V18         [get_ports {gpio3_tri_io[21]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[21]}]
 
 ### JB2.20 (IO_L22P_T3_34)
-set_property PACKAGE_PIN    W18         [get_ports {gpio3_tri_io[16]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[16]}]
+## Used for dac_mosi_o[0]
+# set_property PACKAGE_PIN    W18         [get_ports {gpio3_tri_io[16]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[16]}]
 
 ### JB2.23 (IO_L15P_T2_DQS_34)
-set_property PACKAGE_PIN    T20         [get_ports {gpio3_tri_io[18]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[18]}]
+## Used for spi_clk_o
+# set_property PACKAGE_PIN    T20         [get_ports {gpio3_tri_io[18]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[18]}]
 
 ### JB2.24 (IO_L18N_T2_34)
 set_property PACKAGE_PIN    W16         [get_ports {gpio3_tri_io[1]}]
@@ -421,8 +450,9 @@ set_property PACKAGE_PIN    U20         [get_ports {gpio3_tri_io[19]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[19]}]
 
 ### JB2.26 (IO_L18P_T2_34)
-set_property PACKAGE_PIN    V16         [get_ports {gpio3_tri_io[0]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[0]}]
+## ldac_o
+# set_property PACKAGE_PIN    V16         [get_ports {gpio3_tri_io[0]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[0]}]
 
 ### JB2.29 (IO_L16P_T2_34)
 set_property PACKAGE_PIN    V20         [get_ports {gpio3_tri_io[2]}]
@@ -445,15 +475,16 @@ set_property PACKAGE_PIN    N20         [get_ports {gpio3_tri_io[6]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[6]}]
 
 ### JB2.36 (IO_L13N_T2_MRCC_34)
-set_property PACKAGE_PIN    P19         [get_ports {gpio3_tri_io[23]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[23]}]
+## Used for trigger_i
+# set_property PACKAGE_PIN    P19         [get_ports {gpio3_tri_io[23]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[23]}]
 
 ### JB2.37 (IO_L14N_T2_SRCC_34)
 set_property PACKAGE_PIN    P20         [get_ports {gpio3_tri_io[7]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[7]}]
 
 #### JB2.38 (IO_L13P_T2_MRCC_34)
-## Used for adc_clk_p_i
+## Used for adc_clk_i
 # set_property PACKAGE_PIN    N18         [get_ports {gpio3_tri_io[22]}]
 # set_property IOSTANDARD     LVCMOS33    [get_ports {gpio3_tri_io[22]}]
 
@@ -481,8 +512,9 @@ set_property PACKAGE_PIN    T9          [get_ports {gpio4_tri_io[10]}]
 set_property IOSTANDARD     LVCMOS33    [get_ports {gpio4_tri_io[10]}]
 
 ### JC1.11 (IO_L19P_T3_13)
-set_property PACKAGE_PIN    T5          [get_ports {gpio4_tri_io[12]}]
-set_property IOSTANDARD     LVCMOS33    [get_ports {gpio4_tri_io[12]}]
+## Used for dac_mosi_o[2]
+# set_property PACKAGE_PIN    T5          [get_ports {gpio4_tri_io[12]}]
+# set_property IOSTANDARD     LVCMOS33    [get_ports {gpio4_tri_io[12]}]
 
 ### JC1.12 (IO_L20N_T3_13)
 set_property PACKAGE_PIN    Y13         [get_ports {gpio4_tri_io[15]}]

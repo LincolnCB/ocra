@@ -1,11 +1,15 @@
 ### ADC
 
 # May be vestigial, switched to single ended
-create_bd_port -dir I adc_clk_i
+create_bd_port -dir I ext_clk_i
 
-### LED
+### DAC
 
-create_bd_port -dir O -from 7 -to 0 led_o
+create_bd_port -dir I trigger_i
+create_bd_port -dir O cs_o
+create_bd_port -dir O spi_clk_o
+create_bd_port -dir O ldac_o
+create_bd_port -dir O -from 3 -to 0 dac_mosi_o
 
 ### Baseline GPIO ports
 

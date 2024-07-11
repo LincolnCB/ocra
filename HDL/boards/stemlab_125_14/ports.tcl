@@ -7,6 +7,15 @@
 ## LCB: New single-ended input for snickerdoodle
 create_bd_port -dir I adc_clk_i
 
+## LCB: Rename the exp_tri_io ports to what they'll be used for
+puts "LCB: stemlab_125_14/ports.tcl"
+
+create_bd_port -dir I trigger_i
+create_bd_port -dir O cs_o
+create_bd_port -dir O spi_clk_o
+create_bd_port -dir O ldac_o
+create_bd_port -dir O -from 3 -to 0 dac_mosi_o
+
 # create_bd_port -dir I adc_clk_p_i
 # create_bd_port -dir I adc_clk_n_i
 

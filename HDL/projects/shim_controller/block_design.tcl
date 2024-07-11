@@ -26,33 +26,37 @@ cell xilinx.com:ip:proc_sys_reset:5.0 rst_0
 #     PRIMITIVE PLL
 #     PRIM_IN_FREQ.VALUE_SRC USER
 #     PRIM_IN_FREQ 125.0
-#     PRIM_SOURCE Differential_clock_capable_pin
+#     PRIM_SOURCE Differential_clock_capable_pin <- Default is single-ended
 #     CLKOUT1_USED true
 #     CLKOUT1_REQUESTED_OUT_FREQ 50.0
 #     CLKOUT2_USED false
-#     CLKOUT2_REQUESTED_OUT_FREQ 250.0
-#     CLKOUT2_REQUESTED_PHASE -90.0
+#     CLKOUT2_REQUESTED_OUT_FREQ 250. <- Disabled because USED is false
+#     CLKOUT2_REQUESTED_PHASE -90.0 <- Disabled because USED is false
 #     USE_RESET false
 #     USE_DYN_RECONFIG true
 # } {
 #   clk_in1_p adc_clk_p_i
-#   clk_in1_n adc_clk_n_i
+#   clk_in1_n adc_clk_n_i <- Differential
 # }
 #
 # NEW
 ## LCB: Trying to make single-ended input for snickerdoodle
 # Create clk_wiz
-cell xilinx.com:ip:clk_wiz:6.0 pll_0 {
-    PRIMITIVE PLL
-    PRIM_IN_FREQ.VALUE_SRC USER
-    PRIM_IN_FREQ 125.0
-    CLKOUT1_USED true
-    CLKOUT1_REQUESTED_OUT_FREQ 50.0
-    CLKOUT2_USED false
-    USE_RESET false
-    USE_DYN_RECONFIG true
+cell xilinx.com:ip:clk_wiz:6.0 mmcm_0 {
+  PRIMITIVE MMCM
+  PRIM_SOURCE Single_ended_clock_capable_pin
+  PRIM_IN_FREQ.VALUE_SRC USER
+  PRIM_IN_FREQ 10.0
+  MMCM_REF_JITTER1 0.001
+  CLKOUT1_USED true
+  CLKOUT1_REQUESTED_OUT_FREQ 50.0
+  CLKOUT2_USED false
+  USE_PHASE_ALIGNMENT true
+  JITTER_SEL Min_O_Jitter
+  JITTER_OPTIONS PS
+  USE_DYN_RECONFIG true
 } {
-  clk_in1 adc_clk_i
+  clk_in1 ext_clk_i
 }
 
 # create a block of memory of 256KB, which would consume 56 of the 60 36Kbit memory blocks available in the Z7010
@@ -126,16 +130,16 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
     Clk_slave {Auto}
     Clk_xbar {/ps_0/FCLK_CLK0 (142 MHz)}
     Master {/ps_0/M_AXI_GP0}
-    Slave {/pll_0/s_axi_lite}
+    Slave {/mmcm_0/s_axi_lite}
     intc_ip {/ps_0_axi_periph}
     master_apm {0}
-}  [get_bd_intf_pins pll_0/s_axi_lite]
+}  [get_bd_intf_pins mmcm_0/s_axi_lite]
 
 # seems like by default this is mapped to 0x43c00000/64K
 
 # set the address map for the PLL, note for this interface the basename is "Reg" not "reg0"
-set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_pll_0_Reg]
-set_property OFFSET 0x43C00000 [get_bd_addr_segs ps_0/Data/SEG_pll_0_Reg]
+set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
+set_property OFFSET 0x43C00000 [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
 
 # Create trigger core
 cell open-mri:user:axi_trigger_core:1.0 trigger_core_0 {
@@ -155,56 +159,32 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
 set_property RANGE  4K [get_bd_addr_segs ps_0/Data/SEG_trigger_core_0_reg0]
 set_property OFFSET 0x40202000 [get_bd_addr_segs ps_0/Data/SEG_trigger_core_0_reg0]
 
-# the gradient DAC trigger pulse
-connect_bd_net [get_bd_pins trigger_core_0/trigger_out] [get_bd_pins shim_dac_0/spi_sequencer_0/waveform_trigger]
-
 # The RAM for the gradients should not have wait states?
 set_property -dict [list CONFIG.Register_PortB_Output_of_Memory_Primitives {true} CONFIG.Register_PortB_Output_of_Memory_Core {false}] [get_bd_cells gradient_memory_0]
 
-#
-# try to connect the bottom 8 bits of the pulse output of the sequencer to the positive gpoi
-#
-# Delete input/output port
-delete_bd_objs [get_bd_ports exp_p_tri_io]
-delete_bd_objs [get_bd_ports exp_n_tri_io]
-
-# Create newoutput port
-create_bd_port -dir I -from 7 -to 0 exp_p_tri_io
-#connect_bd_net [get_bd_pins exp_p_tri_io] [get_bd_pins trigger_slice_0/Dout]
-
-# Create output port for the SPI stuff
-create_bd_port -dir O -from 7 -to 0 exp_n_tri_io
-
-# create a slice to extract the trigger from the input
-# Create xlslice
-cell xilinx.com:ip:xlslice:1.0 trigger_slice {
-  DIN_WIDTH 7 DIN_FROM 0 DIN_TO 0 DOUT_WIDTH 1
-}
-# For the shim controller we are using this pinout
-#
-# DIO0_N CS
-# DIO1_N CLK
-# DIO2_N LDAC
-# DIO3_N SDI_BANK0
-# DIO4_N SDI_BANK1
-# DIO5_N SDI_BANK2
-# DIO5_N SDI_BANK3
-
+# the gradient DAC trigger pulse
+connect_bd_net [get_bd_pins trigger_core_0/trigger_out] [get_bd_pins shim_dac_0/spi_sequencer_0/waveform_trigger]
 # connect to pins
-connect_bd_net [get_bd_pins exp_n_tri_io] [get_bd_pins shim_dac_0/spiconcat_0/Dout]
-# make a copy on the positive port as well for scoping (09/24/2019 TW)
-connect_bd_net [get_bd_pins trigger_slice/Din] [get_bd_pins exp_p_tri_io]
-connect_bd_net [get_bd_pins trigger_slice/Dout] [get_bd_pins trigger_core_0/trigger_in]
+connect_bd_net [get_bd_pins trigger_i] [get_bd_pins trigger_core_0/trigger_in]
 
-# the LEDs
-cell xilinx.com:ip:xlconcat:2.1 xled_concat_0 {
-    NUM_PORTS 8
-}
+# SPI DAC connections
+puts "LCB: block_design Connecting SPI DACs"
 
-connect_bd_net [get_bd_pins xled_concat_0/In7] [get_bd_pins pll_0/locked]
-connect_bd_net [get_bd_pins xled_concat_0/In0] [get_bd_pins trigger_core_0/stretched_trigger_out]
+connect_bd_net [get_bd_pins cs_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_cs]
+connect_bd_net [get_bd_pins spi_clk_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_clk]
+connect_bd_net [get_bd_pins ldac_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_ldacn]
+connect_bd_net [get_bd_pins dac_mosi_o] [get_bd_pins shim_dac_0/spiconcat_0/Dout]
 
-connect_bd_net [get_bd_ports led_o] [get_bd_pins xled_concat_0/Dout]
+# Remove debug LEDs for snickerdoodle compatability
+# # the LEDs
+# cell xilinx.com:ip:xlconcat:2.1 xled_concat_0 {
+#     NUM_PORTS 8
+# }
+
+# connect_bd_net [get_bd_pins xled_concat_0/In7] [get_bd_pins mmcm_0/locked]
+# connect_bd_net [get_bd_pins xled_concat_0/In0] [get_bd_pins trigger_core_0/stretched_trigger_out]
+
+# connect_bd_net [get_bd_ports led_o] [get_bd_pins xled_concat_0/Dout]
 
 # Hook up the SPI reference clock
-connect_bd_net [get_bd_pins shim_dac_0/spi_sequencer_0/spi_ref_clk] [get_bd_pins pll_0/clk_out1] 
+connect_bd_net [get_bd_pins shim_dac_0/spi_sequencer_0/spi_ref_clk] [get_bd_pins mmcm_0/clk_out1] 
