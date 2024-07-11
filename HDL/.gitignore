@@ -5,3 +5,4 @@ devicetree.dtb
 tmp/
 vivado*
 LOCAL*
+.Xil/
