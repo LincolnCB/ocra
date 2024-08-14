@@ -33,16 +33,16 @@ typedef struct {
 } gradient_offset_t;
 
 typedef enum {
-	GRAD_ZERO_DISABLED_OUTPUT = 0,
-	GRAD_ZERO_ENABLED_OUTPUT,
-	GRAD_OFFSET_ENABLED_OUTPUT
+        GRAD_ZERO_DISABLED_OUTPUT = 0,
+        GRAD_ZERO_ENABLED_OUTPUT,
+        GRAD_OFFSET_ENABLED_OUTPUT
 } gradient_state_t;
 
 typedef enum {
-	GRAD_AXIS_X = 0,
-	GRAD_AXIS_Y,
-	GRAD_AXIS_Z,
-	GRAD_AXIS_Z2
+        GRAD_AXIS_X = 0,
+        GRAD_AXIS_Y,
+        GRAD_AXIS_Z,
+        GRAD_AXIS_Z2
 } gradient_axis_t;
 
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
 // Function 1
 /* generate a gradient waveform that just changes a state 
 
-	 events like this need a 30us gate time in the sequence
+         events like this need a 30us gate time in the sequence
 
   Notes about the DAC control:
   In the present OCRA hardware configuration of the AD5781 DAC, the RBUF bit must always be set so
@@ -161,7 +161,7 @@ void clear_shim_waveforms( volatile uint32_t *shim)
 {
   for (int k=0; k<65536; k++) {
     shim[k] = 0x0;
-  }	
+  }        
 }
  
 void sigint_handler(int s){
@@ -206,9 +206,9 @@ int main(int argc, char *argv[])
       line_length = 2048;
       ssize_t nchars = getline((char **)&linebuffer,&line_length,input_file);
       if(nchars <= 0)
-	break;
+        break;
       if(linebuffer[0] != '#')
-	line_counter++;
+        line_counter++;
     } while(1);
     
     fprintf(stdout,"%d waveform samples found !\n",line_counter);
@@ -228,8 +228,8 @@ int main(int argc, char *argv[])
     for (int k=0; k<32; k++) {
       waveform_buffer[k] = (int *)malloc(line_counter*sizeof(int));
       if(waveform_buffer[k] == NULL) {
-	fprintf(stderr,"Error allocating waveform memory !\n");
-	exit(-1);
+        fprintf(stderr,"Error allocating waveform memory !\n");
+        exit(-1);
       }
     }
     
@@ -239,22 +239,22 @@ int main(int argc, char *argv[])
       line_length = 2048;
       ssize_t nchars = getline((char **)&linebuffer,&line_length,input_file);
       if(nchars <= 0)
-	break;
+        break;
       if(linebuffer[0] == '#')
-	continue;
+        continue;
 
       int val, offset;
       char *linebuffer_p = linebuffer;
       // found a valid line
       for(int k=0; k<32; k++) {
-	if(sscanf(linebuffer_p," %d%n", &val, &offset) == 0) {
-	  fprintf(stderr,"some sort of parsing error !\n");
-	  fprintf(stderr,"original line: %s\n",linebuffer);
-	  fprintf(stderr,"line fragment %d parsed: %s\n",k,linebuffer_p);
-	  exit(-1);
-	}
-	linebuffer_p = linebuffer_p + offset;
-	waveform_buffer[k][lrcounter] = val;
+        if(sscanf(linebuffer_p," %d%n", &val, &offset) == 0) {
+          fprintf(stderr,"some sort of parsing error !\n");
+          fprintf(stderr,"original line: %s\n",linebuffer);
+          fprintf(stderr,"line fragment %d parsed: %s\n",k,linebuffer_p);
+          exit(-1);
+        }
+        linebuffer_p = linebuffer_p + offset;
+        waveform_buffer[k][lrcounter] = val;
       }
       fprintf(stdout,"."); fflush(stdout);
       lrcounter++;
