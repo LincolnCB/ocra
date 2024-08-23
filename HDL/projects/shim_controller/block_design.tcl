@@ -167,24 +167,41 @@ connect_bd_net [get_bd_pins trigger_core_0/trigger_out] [get_bd_pins shim_dac_0/
 # connect to pins
 connect_bd_net [get_bd_pins trigger_i] [get_bd_pins trigger_core_0/trigger_in]
 
-# SPI DAC connections
-puts "LCB: block_design Connecting SPI DACs"
-
-connect_bd_net [get_bd_pins cs_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_cs]
-connect_bd_net [get_bd_pins spi_clk_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_clk]
-connect_bd_net [get_bd_pins ldac_o] [get_bd_pins shim_dac_0/spi_sequencer_0/spi_ldacn]
-connect_bd_net [get_bd_pins dac_mosi_o] [get_bd_pins shim_dac_0/spiconcat_0/Dout]
-
-# Remove debug LEDs for snickerdoodle compatability
-# # the LEDs
-# cell xilinx.com:ip:xlconcat:2.1 xled_concat_0 {
-#     NUM_PORTS 8
-# }
-
-# connect_bd_net [get_bd_pins xled_concat_0/In7] [get_bd_pins mmcm_0/locked]
-# connect_bd_net [get_bd_pins xled_concat_0/In0] [get_bd_pins trigger_core_0/stretched_trigger_out]
-
-# connect_bd_net [get_bd_ports led_o] [get_bd_pins xled_concat_0/Dout]
-
 # Hook up the SPI reference clock
 connect_bd_net [get_bd_pins shim_dac_0/spi_sequencer_0/spi_ref_clk] [get_bd_pins mmcm_0/clk_out1] 
+
+
+# Connect output buffers
+
+# Differential output buffer for CS
+cell open-mri:user:lcb_differential_out_buffer:1.0 cs_o_buf {
+  DIFF_BUFFER_WIDTH 1
+} {
+  d_in /shim_dac_0/spi_sequencer_0/spi_cs
+  diff_out_p cs_o_p
+  diff_out_n cs_o_n
+}
+# Differential output buffer for SPI clock
+cell open-mri:user:lcb_differential_out_buffer:1.0 spi_clk_o_buf {
+  DIFF_BUFFER_WIDTH 1
+} {
+  d_in /shim_dac_0/spi_sequencer_0/spi_clk
+  diff_out_p spi_clk_o_p
+  diff_out_n spi_clk_o_n
+}
+# Differential output buffer for LDAC
+cell open-mri:user:lcb_differential_out_buffer:1.0 ldac_o_buf {
+  DIFF_BUFFER_WIDTH 1
+} {
+  d_in /shim_dac_0/spi_sequencer_0/spi_ldacn
+  diff_out_p ldac_o_p
+  diff_out_n ldac_o_n
+}
+# Differential output buffer for DAC MOSI
+cell open-mri:user:lcb_differential_out_buffer:1.0 dac_mosi_o_buf {
+  DIFF_BUFFER_WIDTH 4
+} {
+  d_in /shim_dac_0/spiconcat_0/Dout
+  diff_out_p dac_mosi_o_p
+  diff_out_n dac_mosi_o_n
+}
