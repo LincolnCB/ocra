@@ -2,13 +2,13 @@
 
 module lcb_differential_out_buffer #
 (
-    parameter integer DIFF_BUFFER_WIDTH = 1,
+    parameter integer DIFF_BUFFER_WIDTH = 1
 )
 (
     input wire [DIFF_BUFFER_WIDTH-1:0] d_in,
     output wire [DIFF_BUFFER_WIDTH-1:0] diff_out_p,
     output wire [DIFF_BUFFER_WIDTH-1:0] diff_out_n
-)
+);
 
 // Generate DIFF_BUFFER_WIDTH number of the Xilinx OBUFDS primitives
 genvar i;
@@ -18,7 +18,6 @@ generate
         OBUFDS
         #(
             .IOSTANDARD("DEFAULT")
-            .SLEW("FAST")
         )
         obufds_inst
         (

@@ -20,27 +20,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
 # Create proc_sys_reset
 cell xilinx.com:ip:proc_sys_reset:5.0 rst_0
 
-# ORIGINAL
-# # Create clk_wiz
-# cell xilinx.com:ip:clk_wiz:6.0 pll_0 {
-#     PRIMITIVE PLL
-#     PRIM_IN_FREQ.VALUE_SRC USER
-#     PRIM_IN_FREQ 125.0
-#     PRIM_SOURCE Differential_clock_capable_pin <- Default is single-ended
-#     CLKOUT1_USED true
-#     CLKOUT1_REQUESTED_OUT_FREQ 50.0
-#     CLKOUT2_USED false
-#     CLKOUT2_REQUESTED_OUT_FREQ 250. <- Disabled because USED is false
-#     CLKOUT2_REQUESTED_PHASE -90.0 <- Disabled because USED is false
-#     USE_RESET false
-#     USE_DYN_RECONFIG true
-# } {
-#   clk_in1_p adc_clk_p_i
-#   clk_in1_n adc_clk_n_i <- Differential
-# }
-#
-# NEW
-## LCB: Trying to make single-ended input for snickerdoodle
+## LCB: Make single-ended input for snickerdoodle
 # Create clk_wiz
 cell xilinx.com:ip:clk_wiz:6.0 mmcm_0 {
   PRIMITIVE MMCM
@@ -124,7 +104,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
 set_property RANGE 4K [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
 set_property OFFSET 0x40200000 [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
 
-# Connect the PLL to the PS
+# Connect the MMCM to the PS
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
     Clk_master {/ps_0/FCLK_CLK0 (142 MHz)}
     Clk_slave {Auto}
@@ -137,7 +117,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
 
 # seems like by default this is mapped to 0x43c00000/64K
 
-# set the address map for the PLL, note for this interface the basename is "Reg" not "reg0"
+# set the address map for the MMCM, note for this interface the basename is "Reg" not "reg0"
 set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
 set_property OFFSET 0x43C00000 [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
 
