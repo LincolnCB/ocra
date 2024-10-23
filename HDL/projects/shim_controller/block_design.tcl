@@ -170,10 +170,17 @@ cell open-mri:user:lcb_differential_out_buffer:1.0 spi_clk_o_buf {
   diff_out_n spi_clk_o_n
 }
 # Differential output buffer for LDAC
+# Invert the signal first
+cell xilinx.com:ip:util_vector_logic ldac_inv {
+  C_SIZE 1
+  C_OPERATION not
+} {
+  Op1 /shim_dac_0/spi_sequencer_0/spi_ldacn
+}
 cell open-mri:user:lcb_differential_out_buffer:1.0 ldac_o_buf {
   DIFF_BUFFER_WIDTH 1
 } {
-  d_in /shim_dac_0/spi_sequencer_0/spi_ldacn
+  d_in ldac_inv/Res
   diff_out_p ldac_o_p
   diff_out_n ldac_o_n
 }
