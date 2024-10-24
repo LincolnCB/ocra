@@ -6,9 +6,7 @@ set ps_preset boards/${board_name}/ps_${project_name}.xml
 # Create processing_system7
 cell xilinx.com:ip:processing_system7:5.5 ps_0 {
   PCW_IMPORT_BOARD_PRESET $ps_preset
-} {
-  M_AXI_GP0_ACLK ps_0/FCLK_CLK0
-}
+} {}
 
 # Create all required interconnections
 apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
@@ -18,7 +16,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
 } [get_bd_cells ps_0]
 
 # Create proc_sys_reset
-cell xilinx.com:ip:proc_sys_reset:5.0 rst_0
+cell xilinx.com:ip:proc_sys_reset:5.0 rst_0 {} {}
 
 ## LCB: Make single-ended input for snickerdoodle
 # Create clk_wiz
@@ -27,16 +25,18 @@ cell xilinx.com:ip:clk_wiz:6.0 mmcm_0 {
   PRIM_SOURCE Single_ended_clock_capable_pin
   PRIM_IN_FREQ.VALUE_SRC USER
   PRIM_IN_FREQ 10.0
-  MMCM_REF_JITTER1 0.001
+  MMCM_REF_JITTER1 0.0005
   CLKOUT1_USED true
   CLKOUT1_REQUESTED_OUT_FREQ 50.0
   CLKOUT2_USED false
   USE_PHASE_ALIGNMENT true
   JITTER_SEL Min_O_Jitter
   JITTER_OPTIONS PS
-  USE_DYN_RECONFIG true
+  USE_DYN_RECONFIG false
 } {
   clk_in1 ext_clk_i
+  clk_out1 /ps_0/M_AXI_GP0_ACLK
+  clk_out1 /rst_0/slowest_sync_clk
 }
 
 # create a block of memory of 256KB, which would consume 56 of the 60 36Kbit memory blocks available in the Z7010
@@ -104,29 +104,29 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
 set_property RANGE 4K [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
 set_property OFFSET 0x40200000 [get_bd_addr_segs ps_0/Data/SEG_cfg_0_reg0]
 
-# Connect the MMCM to the PS
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
-    Clk_master {/ps_0/FCLK_CLK0 (142 MHz)}
-    Clk_slave {Auto}
-    Clk_xbar {/ps_0/FCLK_CLK0 (142 MHz)}
-    Master {/ps_0/M_AXI_GP0}
-    Slave {/mmcm_0/s_axi_lite}
-    intc_ip {/ps_0_axi_periph}
-    master_apm {0}
-}  [get_bd_intf_pins mmcm_0/s_axi_lite]
+# # Connect the MMCM to the PS
+# apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {
+#     Clk_master {/mmcm_0/clk_out1 (142 MHz)}
+#     Clk_slave {Auto}
+#     Clk_xbar {/mmcm_0/clk_out1 (142 MHz)}
+#     Master {/ps_0/M_AXI_GP0}
+#     Slave {/mmcm_0/s_axi_lite}
+#     intc_ip {/ps_0_axi_periph}
+#     master_apm {0}
+# }  [get_bd_intf_pins mmcm_0/s_axi_lite]
 
-# seems like by default this is mapped to 0x43c00000/64K
+# # seems like by default this is mapped to 0x43c00000/64K
 
-# set the address map for the MMCM, note for this interface the basename is "Reg" not "reg0"
-set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
-set_property OFFSET 0x43C00000 [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
+# # set the address map for the MMCM, note for this interface the basename is "Reg" not "reg0"
+# set_property RANGE 64K [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
+# set_property OFFSET 0x43C00000 [get_bd_addr_segs ps_0/Data/SEG_mmcm_0_Reg]
 
 # Create trigger core
 cell open-mri:user:axi_trigger_core:1.0 trigger_core_0 {
   C_S_AXI_DATA_WIDTH 32
   C_S_AXI_ADDR_WIDTH 12
 } {
-    aclk /ps_0/FCLK_CLK0
+    aclk /mmcm_0/clk_out1
     aresetn /rst_0/peripheral_aresetn
 }
 

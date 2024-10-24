@@ -19,7 +19,7 @@ cell open-mri:user:axi_four_ltc2656_spi:1.0 spi_sequencer_0 {
   C_S_AXI_DATA_WIDTH 32
   C_S_AXI_ADDR_WIDTH 32
 } {
-  aclk /ps_0/FCLK_CLK0
+  aclk /mmcm_0/clk_out1
   aresetn /rst_0/peripheral_aresetn
 }
 
