@@ -15,8 +15,12 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {
   Slave Disable
 } [get_bd_cells ps_0]
 
+# Create xlconstant (default value 1) to hold reset high (active low)
+cell xilinx.com:ip:xlconstant const_0
 # Create proc_sys_reset
-cell xilinx.com:ip:proc_sys_reset:5.0 rst_0 {} {}
+cell xilinx.com:ip:proc_sys_reset:5.0 rst_0 {} {
+  ext_reset_in const_0/dout
+}
 
 ## LCB: Make single-ended input for snickerdoodle
 # Create clk_wiz
@@ -37,6 +41,7 @@ cell xilinx.com:ip:clk_wiz:6.0 mmcm_0 {
   clk_in1 ext_clk_i
   clk_out1 /ps_0/M_AXI_GP0_ACLK
   clk_out1 /rst_0/slowest_sync_clk
+  clk_out1 mmcm_clk_o
 }
 
 # create a block of memory of 256KB, which would consume 56 of the 60 36Kbit memory blocks available in the Z7010

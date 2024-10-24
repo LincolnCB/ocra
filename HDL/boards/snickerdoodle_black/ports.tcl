@@ -14,6 +14,9 @@ create_bd_port -dir O -from 3 -to 0 dac_mosi_o_p
 create_bd_port -dir O -from 3 -to 0 dac_mosi_o_n
 
 
+# Scopable 50 MHz clock (for testing 2024-10-24)
+create_bd_port -dir O mmcm_clk_o
+
 #### Baseline GPIO ports
 # create_bd_port -dir IO -from 24 -to 0 gpio0_tri_io
 # create_bd_port -dir IO -from 24 -to 0 gpio1_tri_io

@@ -80,6 +80,11 @@ set_property PACKAGE_PIN T10 [get_ports {dac_mosi_o_n[1]}]
 set_property PACKAGE_PIN U5  [get_ports {dac_mosi_o_n[2]}]
 set_property PACKAGE_PIN U17 [get_ports {dac_mosi_o_n[3]}]
 
+# Scopable 50 MHz clock (for testing 2024-10-24)
+# Pin: 50MHz_Clk JB1.4 T19
+set_property IOSTANDARD LVCMOS25 [get_ports mmcm_clk_o]
+set_property PACKAGE_PIN T19 [get_ports mmcm_clk_o]
+
 
 # #------------------------------------------------------------------------------
 # # Default constraints for GPIO outputs
